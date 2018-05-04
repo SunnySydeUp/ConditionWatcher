@@ -34,7 +34,8 @@ class ConditionWatcher private constructor() {
          * pull down to refresh.
          */
         @Throws(Exception::class)
-        fun waitForCondition(instruction: Instruction, conditionUnmetCallback: (() -> Unit)? = null) {
+        @JvmStatic
+        fun waitForCondition(instruction: Instruction, conditionWatcherCallback: ConditionWatcherCallback?) {
             var status = CONDITION_NOT_MET
             var elapsedTime = 0
 
@@ -44,7 +45,7 @@ class ConditionWatcher private constructor() {
                 } else {
                     elapsedTime += instance.watchInterval
                     Thread.sleep(instance.watchInterval.toLong())
-                    conditionUnmetCallback?.invoke()
+                    conditionWatcherCallback?.conditionUnmet()
                 }
 
                 if (elapsedTime >= instance.timeoutLimit) {
@@ -65,4 +66,8 @@ class ConditionWatcher private constructor() {
             instance.timeoutLimit = ms
         }
     }
+}
+
+interface ConditionWatcherCallback {
+    fun conditionUnmet()
 }
